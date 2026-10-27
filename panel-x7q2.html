@@ -55,7 +55,7 @@
 <body>
 <header class="band"><div class="wrap">
   <h1>Site admin</h1>
-  <div class="sub">Knesset 2026 Live · visitor stats · refreshes every 15 seconds · <span id="clock">—</span></div>
+  <div class="sub">Knesset 2026 Live · visitor stats · refreshes every 15 seconds · <span id="clock">loading…</span></div>
 </div></header>
 
 <main class="wrap">
@@ -94,50 +94,72 @@
 const NS = 'knesset26live-cbt', API = 'https://abacus.jasoncameron.dev/get/' + NS + '/';
 const $ = (id) => document.getElementById(id);
 const fmt = new Intl.NumberFormat('en');
-async function get(key) {
-  try { const r = await fetch(API + key, { cache: 'no-store' }); if (!r.ok) return 0; const j = await r.json(); return Number(j.value) || 0; }
-  catch { return null; }
+// The counting service allows about one request per second, so reads go out one at a time.
+const queue = []; let busy = false;
+function pump() {
+  if (busy || !queue.length) return; busy = true;
+  const job = queue.shift();
+  fetch(API + job.key, { cache: 'no-store' })
+    .then(async (r) => {
+      if (r.status === 429 && job.tries < 3) { job.tries++; queue.unshift(job); return; }
+      if (r.status === 404) return job.done(0);
+      if (!r.ok) return job.done(null);
+      const j = await r.json(); job.done(Number(j.value) || 0);
+    })
+    .catch(() => job.done(null))
+    .finally(() => setTimeout(() => { busy = false; pump(); }, 1100));
 }
+const get = (key, front) => new Promise((done) => { const job = { key, tries: 0, done }; front ? queue.unshift(job) : queue.push(job); pump(); });
+
 function ilParts(d) {
   return Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(d).map((p) => [p.type, p.value]));
 }
-const show = (id, v) => { $(id).textContent = v == null ? '—' : fmt.format(v); };
+const show = (id, v) => { if (v != null) $(id).textContent = fmt.format(v); };
+const hourVals = new Map();
 
-async function refresh() {
-  const now = Date.now();
-  $('clock').textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(now));
-  const m = Math.floor(now / 60000);
-  const p = ilParts(new Date(now)); const day = p.year + p.month + p.day;
-  const [prev, cur, views, unique, today, sd, so, sdir] = await Promise.all([
-    get('live-' + (m - 1)), get('live-' + m), get('views'), get('visitors'), get('day-' + day), get('src-discord'), get('src-other'), get('src-direct'),
-  ]);
-  show('online', prev == null && cur == null ? null : Math.max(prev || 0, cur || 0));
+async function stats() {
+  const now = Date.now(), m = Math.floor(now / 60000);
+  const p = ilParts(new Date(now)), day = p.year + p.month + p.day, hourKey = 'hour-' + day + p.hour;
+  const [prev, cur] = await Promise.all([get('live-' + (m - 1), true), get('live-' + m, true)]);
+  if (prev != null || cur != null) show('online', Math.max(prev || 0, cur || 0));
+  const [views, unique, today, hour] = await Promise.all([get('views'), get('visitors'), get('day-' + day), get(hourKey)]);
   show('views', views); show('unique', unique); show('today', today);
+  if (hour != null) { hourVals.set(hourKey, hour); drawChart(); }
+  $('clock').textContent = 'last checked ' + new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+}
 
+async function sources() {
+  const [sd, so, sdir] = await Promise.all([get('src-discord'), get('src-other'), get('src-direct')]);
   const total = (sd || 0) + (so || 0) + (sdir || 0) || 1;
   const src = $('src'); src.replaceChildren();
   [['Discord (browser)', sd], ['Other websites', so], ['Direct or app', sdir]].forEach(([name, v]) => {
     const row = document.createElement('div'); row.className = 'row';
     const n = document.createElement('span'); n.textContent = name;
-    const bar = document.createElement('i'); bar.style.width = ((v || 0) / total * 100) + '%';
+    const track = document.createElement('div'); const bar = document.createElement('i'); bar.style.width = ((v || 0) / total * 100) + '%'; track.append(bar);
     const b = document.createElement('b'); b.textContent = fmt.format(v || 0);
-    row.append(n, document.createElement('div'), b); row.children[1].append(bar); src.append(row);
+    row.append(n, track, b); src.append(row);
   });
 }
 
-async function refreshChart() {
-  const hours = [];
-  for (let i = 23; i >= 0; i--) { const p = ilParts(new Date(Date.now() - i * 3600000)); hours.push({ key: 'hour-' + p.year + p.month + p.day + p.hour, label: p.hour }); }
-  const vals = await Promise.all(hours.map((h) => get(h.key)));
-  const max = Math.max(1, ...vals.map((v) => v || 0));
+function hours() {
+  const out = [];
+  for (let i = 23; i >= 0; i--) { const p = ilParts(new Date(Date.now() - i * 3600000)); out.push({ key: 'hour-' + p.year + p.month + p.day + p.hour, label: p.hour }); }
+  return out;
+}
+function drawChart() {
+  const hs = hours(), vals = hs.map((h) => hourVals.get(h.key) || 0);
+  const max = Math.max(1, ...vals);
   const chart = $('chart'), axis = $('axis'); chart.replaceChildren(); axis.replaceChildren();
-  hours.forEach((h, i) => {
+  hs.forEach((h, i) => {
     const bar = document.createElement('div'); if (i === 23) bar.className = 'now';
-    bar.style.height = ((vals[i] || 0) / max * 100) + '%'; bar.title = `${h.label}:00 · ${vals[i] || 0} views`;
+    bar.style.height = (vals[i] / max * 100) + '%'; bar.title = `${h.label}:00 · ${vals[i]} views`;
     if (vals[i]) { const s = document.createElement('span'); s.textContent = vals[i]; bar.append(s); }
     chart.append(bar);
     const t = document.createElement('span'); t.textContent = i % 3 === 0 || i === 23 ? h.label : ''; axis.append(t);
   });
+}
+async function loadPastHours() {
+  for (const h of hours().slice(0, 23)) { if (!hourVals.has(h.key)) { const v = await get(h.key); if (v != null) { hourVals.set(h.key, v); drawChart(); } } }
 }
 
 function meUI() {
@@ -149,8 +171,19 @@ $('me-toggle').addEventListener('click', () => {
   try { const off = localStorage.getItem('kn_notrack') === '1'; if (off) localStorage.removeItem('kn_notrack'); else localStorage.setItem('kn_notrack', '1'); } catch {}
   meUI();
 });
-meUI(); refresh(); refreshChart();
-setInterval(refresh, 15000); setInterval(refreshChart, 120000);
+
+meUI(); drawChart();
+(async function loop() {
+  let n = 0;
+  for (;;) {
+    const t = Date.now();
+    await stats();
+    if (n % 4 === 0) await sources();
+    if (n === 0) loadPastHours();
+    n++;
+    await new Promise((r) => setTimeout(r, Math.max(1000, 15000 - (Date.now() - t))));
+  }
+})();
 </script>
 </body>
 </html>
