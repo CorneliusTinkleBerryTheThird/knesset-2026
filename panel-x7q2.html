@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Knesset 2026 Live · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+  :root {
+    --bg: #eef1f6; --panel: #ffffff; --ink: #14213d; --muted: #5b6577; --line: #d9dee8; --band: #14213d; --band-ink: #f4f6fb;
+    --accent: #2856a8; --live: #d33a2c; --ok: #23876a; --track: #e3e7ef;
+    --serif: "Frank Ruhl Libre", Georgia, serif; --sans: "Assistant", "Segoe UI", system-ui, sans-serif; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d1424; --panel: #151e33; --ink: #e9edf6; --muted: #9aa5ba; --line: #26314a; --band: #0a1020; --band-ink: #e9edf6;
+      --accent: #5b8be0; --live: #ff5a4a; --ok: #4cbf98; --track: #222c44; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
+  .band { background: var(--band); color: var(--band-ink); padding-block: 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .wrap { max-width: 1000px; margin-inline: auto; }
+  main.wrap { padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 16px; }
+  h1 { font-family: var(--serif); margin: 0; font-size: 28px; }
+  .sub { opacity: .85; font-size: 14px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+  .tile, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+  .tile span { color: var(--muted); font-size: 14px; }
+  .tile b { font-family: var(--serif); font-size: 40px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .tile.live { border-color: var(--live); }
+  .tile.live span:first-child { display: inline-flex; align-items: center; gap: 7px; color: var(--live); font-weight: 700; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--live); }
+  @media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 1.4s ease-in-out infinite; } }
+  @keyframes pulse { 50% { opacity: .2; } }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 21px; margin: 0; }
+  .note { color: var(--muted); font-size: 14px; margin: 0; }
+  .chart { position: relative; display: grid; grid-template-columns: repeat(24, 1fr); align-items: end; gap: 3px; height: 180px; padding-top: 18px; }
+  .chart div { position: relative; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
+  .chart div.now { background: var(--live); }
+  .chart div span { position: absolute; top: -17px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .axis { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; font-size: 11px; color: var(--muted); text-align: center; }
+  .src { display: grid; gap: 10px; }
+  .row { display: grid; grid-template-columns: 9rem 1fr 3.5rem; gap: 10px; align-items: center; }
+  .row i { display: block; height: 12px; border-radius: 6px; background: var(--accent); }
+  .row b { text-align: right; font-variant-numeric: tabular-nums; }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
+  button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <h1>Site admin</h1>
+  <div class="sub">Knesset 2026 Live · visitor stats · refreshes every 15 seconds · <span id="clock">—</span></div>
+</div></header>
+
+<main class="wrap">
+  <section class="tiles">
+    <div class="tile live"><span><i class="dot"></i>Online now</span><b id="online">—</b><span>open on the site in the last minute</span></div>
+    <div class="tile"><span>Visitors today</span><b id="today">—</b><span>page views since midnight</span></div>
+    <div class="tile"><span>Unique visitors</span><b id="unique">—</b><span>different browsers, all time</span></div>
+    <div class="tile"><span>Total page views</span><b id="views">—</b><span>all time</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Page views, last 24 hours</h2>
+    <p class="note">Each bar is one hour, Israel time. The red bar is the current hour.</p>
+    <div class="chart" id="chart"></div>
+    <div class="axis" id="axis"></div>
+  </section>
+
+  <div class="two">
+    <section class="card">
+      <h2>Where visitors come from</h2>
+      <div class="src" id="src"></div>
+      <p class="note">Clicks from the Discord app often arrive without a source, so they show under "Direct or app".</p>
+    </section>
+    <section class="card">
+      <h2>Your own visits</h2>
+      <p class="note" id="me-state">—</p>
+      <div><button id="me-toggle" type="button">—</button></div>
+      <p class="muted">Turn this on in each browser you use, so your own checks don't count as visitors.</p>
+    </section>
+  </div>
+
+  <p class="muted">Counts only: no names, IP addresses or cookies are collected. <a href="./">Open the public site</a></p>
+</main>
+
+<script>
+const NS = 'knesset26live-cbt', API = 'https://abacus.jasoncameron.dev/get/' + NS + '/';
+const $ = (id) => document.getElementById(id);
+const fmt = new Intl.NumberFormat('en');
+async function get(key) {
+  try { const r = await fetch(API + key, { cache: 'no-store' }); if (!r.ok) return 0; const j = await r.json(); return Number(j.value) || 0; }
+  catch { return null; }
+}
+function ilParts(d) {
+  return Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(d).map((p) => [p.type, p.value]));
+}
+const show = (id, v) => { $(id).textContent = v == null ? '—' : fmt.format(v); };
+
+async function refresh() {
+  const now = Date.now();
+  $('clock').textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(now));
+  const m = Math.floor(now / 60000);
+  const p = ilParts(new Date(now)); const day = p.year + p.month + p.day;
+  const [prev, cur, views, unique, today, sd, so, sdir] = await Promise.all([
+    get('live-' + (m - 1)), get('live-' + m), get('views'), get('visitors'), get('day-' + day), get('src-discord'), get('src-other'), get('src-direct'),
+  ]);
+  show('online', prev == null && cur == null ? null : Math.max(prev || 0, cur || 0));
+  show('views', views); show('unique', unique); show('today', today);
+
+  const total = (sd || 0) + (so || 0) + (sdir || 0) || 1;
+  const src = $('src'); src.replaceChildren();
+  [['Discord (browser)', sd], ['Other websites', so], ['Direct or app', sdir]].forEach(([name, v]) => {
+    const row = document.createElement('div'); row.className = 'row';
+    const n = document.createElement('span'); n.textContent = name;
+    const bar = document.createElement('i'); bar.style.width = ((v || 0) / total * 100) + '%';
+    const b = document.createElement('b'); b.textContent = fmt.format(v || 0);
+    row.append(n, document.createElement('div'), b); row.children[1].append(bar); src.append(row);
+  });
+}
+
+async function refreshChart() {
+  const hours = [];
+  for (let i = 23; i >= 0; i--) { const p = ilParts(new Date(Date.now() - i * 3600000)); hours.push({ key: 'hour-' + p.year + p.month + p.day + p.hour, label: p.hour }); }
+  const vals = await Promise.all(hours.map((h) => get(h.key)));
+  const max = Math.max(1, ...vals.map((v) => v || 0));
+  const chart = $('chart'), axis = $('axis'); chart.replaceChildren(); axis.replaceChildren();
+  hours.forEach((h, i) => {
+    const bar = document.createElement('div'); if (i === 23) bar.className = 'now';
+    bar.style.height = ((vals[i] || 0) / max * 100) + '%'; bar.title = `${h.label}:00 · ${vals[i] || 0} views`;
+    if (vals[i]) { const s = document.createElement('span'); s.textContent = vals[i]; bar.append(s); }
+    chart.append(bar);
+    const t = document.createElement('span'); t.textContent = i % 3 === 0 || i === 23 ? h.label : ''; axis.append(t);
+  });
+}
+
+function meUI() {
+  let off = false; try { off = localStorage.getItem('kn_notrack') === '1'; } catch {}
+  $('me-state').textContent = off ? 'This browser is not counted as a visitor.' : 'This browser is counted when you open the public site.';
+  $('me-toggle').textContent = off ? 'Count my visits again' : "Don't count my visits";
+}
+$('me-toggle').addEventListener('click', () => {
+  try { const off = localStorage.getItem('kn_notrack') === '1'; if (off) localStorage.removeItem('kn_notrack'); else localStorage.setItem('kn_notrack', '1'); } catch {}
+  meUI();
+});
+meUI(); refresh(); refreshChart();
+setInterval(refresh, 15000); setInterval(refreshChart, 120000);
+</script>
+</body>
+</html>

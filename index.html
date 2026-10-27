@@ -253,5 +253,23 @@ async function refresh() {
 refresh();
 setInterval(refresh, 120000);
 </script>
+<script>
+/* Anonymous visit counter: counts only, no cookies, no personal data. */
+(() => {
+  const NS = 'knesset26live-cbt', API = 'https://abacus.jasoncameron.dev/hit/' + NS + '/';
+  let skip = false; try { skip = localStorage.getItem('kn_notrack') === '1'; } catch {}
+  if (skip) return;
+  const hit = (k) => fetch(API + k, { mode: 'cors', keepalive: true }).catch(() => {});
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).map((p) => [p.type, p.value]));
+  const day = parts.year + parts.month + parts.day;
+  hit('views'); hit('day-' + day); hit('hour-' + day + parts.hour);
+  let seen = false; try { seen = localStorage.getItem('kn_seen') === '1'; localStorage.setItem('kn_seen', '1'); } catch {}
+  if (!seen) hit('visitors');
+  const ref = (document.referrer || '').toLowerCase();
+  hit(ref.includes('discord') ? 'src-discord' : ref ? 'src-other' : 'src-direct');
+  const beat = () => hit('live-' + Math.floor(Date.now() / 60000));
+  beat(); setInterval(beat, 60000);
+})();
+</script>
 </body>
 </html>
