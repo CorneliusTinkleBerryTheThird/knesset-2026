@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Knesset 2026 Live</title>
+<meta name="description" content="Live results for Israel's 2026 Knesset election: who is winning, the top 10 parties, results by region and the latest updates.">
+<meta property="og:title" content="Knesset 2026 Live">
+<meta property="og:description" content="Who is winning Israel's election: seats by bloc, top 10 parties, results by region. Updated hourly.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#14213d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+  /* Layout: one column of cards, two-up on wide screens. Election-night newsroom: deep navy band, paper cards. */
+  :root {
+    --bg: #eef1f6; --panel: #ffffff; --ink: #14213d; --muted: #5b6577; --line: #d9dee8; --band: #14213d; --band-ink: #f4f6fb;
+    --nb: #2856a8; --op: #d97a1e; --ar: #23876a; --live: #d33a2c; --track: #e3e7ef;
+    --serif: "Frank Ruhl Libre", Georgia, "Times New Roman", serif;
+    --sans: "Assistant", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d1424; --panel: #151e33; --ink: #e9edf6; --muted: #9aa5ba; --line: #26314a; --band: #0a1020; --band-ink: #e9edf6;
+      --nb: #5b8be0; --op: #f0a052; --ar: #4cbf98; --live: #ff5a4a; --track: #222c44; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; }
+  .band { background: var(--band); color: var(--band-ink); padding-block: 22px 26px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .wrap { max-width: 1100px; margin-inline: auto; }
+  main.wrap { padding-block: 22px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+  .status { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 14px; opacity: .92; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px; border-radius: 999px; background: rgba(255,255,255,.1); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--live); }
+  @media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 1.6s ease-in-out infinite; } }
+  @keyframes pulse { 50% { opacity: .25; } }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 5vw, 46px); line-height: 1.1; margin: 10px 0 8px; text-wrap: balance; }
+  .headline { margin: 0; font-size: 18px; max-width: 62ch; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 23px; margin: 0; }
+  .note { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 18px; }
+
+  .bar-wrap { position: relative; padding-top: 24px; }
+  .track { display: flex; height: 46px; border-radius: 8px; overflow: hidden; background: var(--track); }
+  .track i { display: block; height: 100%; transition: width .6s ease; }
+  .mid { position: absolute; top: 16px; bottom: -8px; width: 2px; background: var(--ink); }
+  .mid span { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .sides { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; margin-top: 14px; }
+  .sides div { display: grid; }
+  .sides div:nth-child(2) { text-align: center; }
+  .sides div:nth-child(3) { text-align: right; }
+  .sides b { font-family: var(--serif); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .sides .nm { font-weight: 700; }
+  .sides small { color: var(--muted); font-size: 13px; }
+
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-size: 13px; color: var(--muted); font-weight: 600; padding: 4px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .rk { color: var(--muted); width: 2rem; }
+  .pt { font-weight: 700; white-space: nowrap; }
+  .ld { color: var(--muted); font-size: 14px; }
+  .bc { width: 42%; }
+  .bc i { display: block; height: 12px; border-radius: 6px; }
+  .sn { text-align: right; font-weight: 700; font-size: 18px; width: 3rem; }
+  .c { text-align: right; }
+  .tw { overflow-x: auto; }
+  @media (max-width: 560px) { .hn { display: none; } }
+
+  .map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(88px, auto)); gap: 6px; }
+  .tile { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; padding: 9px; display: grid; align-content: space-between; gap: 4px; background: var(--panel); min-width: 0; }
+  .tile .fill { position: absolute; inset: 0; }
+  .tile > *:not(.fill) { position: relative; }
+  .tile strong { font-size: 15px; overflow-wrap: anywhere; }
+  .tile small { color: var(--muted); font-size: 12px; }
+  .tile .lead { font-weight: 700; font-size: 13px; }
+  .meter { height: 4px; border-radius: 2px; background: var(--track); overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--muted); }
+
+  .feed { list-style: none; margin: 0; padding: 0; max-height: 28rem; overflow: auto; }
+  .feed li { display: grid; grid-template-columns: 3.6rem 1fr; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .feed li:last-child { border-bottom: 0; }
+  .feed time { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; padding-top: 1px; }
+  .feed li.new time { color: var(--live); font-weight: 700; }
+  .feed p { margin: 0; }
+  .feed a { color: var(--muted); font-size: 13px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; }
+  details summary { cursor: pointer; font-family: var(--serif); font-size: 21px; }
+  details[open] summary { margin-bottom: 10px; }
+  footer { color: var(--muted); font-size: 13px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--nb); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="status"><span class="chip"><i class="dot"></i><span id="phase">Loading…</span></span><span>Updated <b id="updated">—</b> Israel time · refreshes automatically</span></div>
+    <h1>Knesset 2026 Live</h1>
+    <p class="headline" id="headline"></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>Who is winning?</h2>
+    <p class="note">All 120 Knesset seats in one bar. A side needs to pass the line (61 seats) to form a government.</p>
+    <div class="bar-wrap">
+      <div class="track" id="track"></div>
+      <div class="mid" style="left: calc(50.83% - 1px)"><span>61 to govern</span></div>
+    </div>
+    <div class="sides">
+      <div><b id="n-nb">—</b><span class="nm">Netanyahu bloc</span><small id="s-nb"></small></div>
+      <div><b id="n-ar">—</b><span class="nm">Arab parties</span><small>Oppose Netanyahu, rarely join governments</small></div>
+      <div><b id="n-op">—</b><span class="nm">Opposition</span><small id="s-op"></small></div>
+    </div>
+    <p class="note" id="src"></p>
+  </section>
+
+  <div class="two">
+    <section class="card">
+      <h2>Top 10 parties</h2>
+      <p class="note">Projected seats, largest first. Tied parties share a rank.</p>
+      <div class="tw"><table>
+        <thead><tr><th>#</th><th>Party</th><th class="hn">Leader</th><th class="bc"></th><th class="c">Seats</th></tr></thead>
+        <tbody id="top10"></tbody>
+      </table></div>
+      <div class="legend"><span><i style="background:var(--nb)"></i>Netanyahu bloc</span><span><i style="background:var(--op)"></i>Opposition</span><span><i style="background:var(--ar)"></i>Arab parties</span></div>
+    </section>
+
+    <section class="card">
+      <h2>Results by region</h2>
+      <p class="note">Israel's districts from north to south (a simple layout, not to scale). Each fills in with its leading party as votes are counted there.</p>
+      <div class="map" id="map"></div>
+      <div class="legend"><span><i style="background:var(--nb)"></i>Netanyahu-bloc party leads</span><span><i style="background:var(--op)"></i>Opposition party leads</span><span><i style="background:var(--ar)"></i>Arab party leads</span></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Latest updates</h2>
+    <ul class="feed" id="feed"></ul>
+  </section>
+
+  <details class="card">
+    <summary>Compare the TV exit polls</summary>
+    <p class="note">Exit polls ask voters as they leave the polling station. They are estimates and often miss by a few seats. Blank means not reported.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Channel</th><th class="c">Likud</th><th class="c">Yashar</th><th class="c">Netanyahu bloc</th><th class="c">Opposition</th><th class="c">Arab parties</th></tr></thead>
+      <tbody id="channels"></tbody>
+    </table></div>
+  </details>
+
+  <footer>How the count works: each polling station counts after voting closes at 22:00. Soldiers', hospital and diplomatic ballots are counted later at the Knesset. Final official results are due by 4 November 2026. A party needs 3.25% of the vote to win seats. Sources: Central Elections Committee, Kan 11, Channel 12, Channel 13, Channel 14, Times of Israel and other Israeli media, linked in the updates.</footer>
+</main>
+
+<script>
+const BLOCS = ['Netanyahu bloc', 'Opposition', 'Arab parties'];
+const COLOR = { 'Netanyahu bloc': 'var(--nb)', 'Opposition': 'var(--op)', 'Arab parties': 'var(--ar)' };
+const MAJ = 61, TOTAL = 120;
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const ilTime = (iso) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+const pct = (x) => Math.round(Number(x) * 100) + '%';
+
+async function load(name) {
+  try { const r = await fetch(`data/${name}.json?t=${Date.now()}`, { cache: 'no-store' }); return r.ok ? await r.json() : []; }
+  catch { return []; }
+}
+
+function ranked(rows) {
+  const list = rows.map((r) => ({ ...r, seats: Number(r.seats) })).filter((r) => r.seats > 0).sort((a, b) => b.seats - a.seats);
+  return list.map((r) => ({ ...r, rank: 1 + list.filter((o) => o.seats > r.seats).length }));
+}
+
+function render(d) {
+  const st = d.status[0] || {};
+  const useOfficial = d.official.some((r) => Number(r.seats) > 0);
+  const current = ranked(useOfficial ? d.official : d.exitpolls.filter((r) => r.channel === 'Kan 11'));
+
+  $('phase').textContent = st.phase === 'final' ? 'Final results' : st.phase === 'counting' ? `Official count · ${pct(st.counted || 0)} counted` : 'Exit polls · count not started';
+  $('updated').textContent = st.updated ? ilTime(st.updated) : '—';
+  $('headline').textContent = st.headline || '';
+  $('src').textContent = 'Source: ' + (useOfficial ? `official count, ${pct(st.counted || 0)} of votes counted.` : 'Kan 11 exit poll. The official count replaces it once results come in.');
+
+  const sum = (b) => current.filter((r) => r.bloc === b).reduce((s, r) => s + r.seats, 0);
+  const nb = sum('Netanyahu bloc'), op = sum('Opposition'), ar = sum('Arab parties');
+  const rest = Math.max(0, TOTAL - nb - op - ar);
+  const track = $('track'); track.replaceChildren();
+  [[nb, 'var(--nb)'], [rest, 'transparent'], [ar, 'var(--ar)'], [op, 'var(--op)']].forEach(([n, c]) => { const i = el('i'); i.style.width = (n / TOTAL * 100) + '%'; i.style.background = c; i.title = n + ' seats'; track.append(i); });
+  $('n-nb').textContent = nb; $('n-op').textContent = op; $('n-ar').textContent = ar;
+  $('s-nb').textContent = nb >= MAJ ? 'Has a majority' : `${MAJ - nb} short of 61`;
+  $('s-op').textContent = op >= MAJ ? 'Has a majority' : op + ar >= MAJ ? `${MAJ - op} short alone · ${op + ar} with Arab parties` : `${MAJ - op} short of 61`;
+
+  const tb = $('top10'); tb.replaceChildren();
+  const top = current.filter((r) => r.rank <= 10); const max = Math.max(1, ...top.map((r) => r.seats));
+  top.forEach((r) => {
+    const tr = el('tr');
+    tr.append(el('td', 'rk', r.rank), el('td', 'pt', r.party), el('td', 'ld hn', r.leader));
+    const bc = el('td', 'bc'); const i = el('i'); i.style.width = (r.seats / max * 100) + '%'; i.style.background = COLOR[r.bloc] || 'var(--muted)'; bc.append(i);
+    tr.append(bc, el('td', 'sn', r.seats)); tb.append(tr);
+  });
+
+  const PLACE = { 'Northern': [2, 1, 2, 1], 'Haifa': [1, 1, 1, 1], 'Tel Aviv': [1, 2, 1, 1], 'Central': [2, 2, 1, 1], 'Judea and Samaria': [3, 2, 1, 2], 'Jerusalem': [2, 3, 1, 1], 'Southern': [1, 3, 1, 2] };
+  const blocOf = (p) => { const r = current.find((x) => x.party === p) || d.exitpolls.find((x) => x.party === p); return r ? r.bloc : null; };
+  const map = $('map'); map.replaceChildren();
+  d.regions.forEach((r) => {
+    const t = el('div', 'tile'); const p = PLACE[r.district] || [1, 4, 1, 1];
+    t.style.gridColumn = `${p[0]} / span ${p[2]}`; t.style.gridRow = `${p[1]} / span ${p[3]}`;
+    const fill = el('div', 'fill'); t.append(fill, el('strong', null, r.district));
+    if (r.leader_party) {
+      fill.style.background = COLOR[blocOf(r.leader_party)] || 'var(--muted)';
+      fill.style.opacity = 0.18 + 0.5 * Math.min(1, Number(r.leader_share || 0) / 0.5);
+      t.append(el('span', 'lead', `${r.leader_party}${r.leader_share != null ? ' ' + pct(r.leader_share) : ''}`));
+      if (r.second_party) t.append(el('small', null, `then ${r.second_party}${r.second_share != null ? ' ' + pct(r.second_share) : ''}`));
+    } else t.append(el('small', null, 'Awaiting count'));
+    const c = r.counted == null ? 0 : Number(r.counted);
+    const m = el('div', 'meter'); const mi = el('i'); mi.style.width = (c * 100) + '%'; m.append(mi);
+    t.append(m, el('small', null, pct(c) + ' counted')); map.append(t);
+  });
+
+  const feed = $('feed'); feed.replaceChildren();
+  const ups = [...d.updates].sort((a, b) => new Date(b.time) - new Date(a.time));
+  ups.forEach((u, i) => {
+    const li = el('li', i === 0 ? 'new' : null); const body = el('div');
+    body.append(el('p', null, u.text));
+    if (u.url) { const a = el('a', null, u.source || 'Source'); a.href = u.url; a.target = '_blank'; a.rel = 'noopener'; body.append(a); }
+    li.append(el('time', null, ilTime(u.time)), body); feed.append(li);
+  });
+
+  const ch = $('channels'); ch.replaceChildren();
+  ['Kan 11', 'Channel 12', 'Channel 13', 'Channel 14'].forEach((name) => {
+    const ps = d.exitpolls.filter((r) => r.channel === name);
+    const seat = (p) => { const r = ps.find((x) => x.party === p); return r ? r.seats : ''; };
+    const rep = d.blocs.find((b) => b.channel === name);
+    const full = ps.reduce((s, r) => s + Number(r.seats), 0) === TOTAL;
+    const bs = (b, k) => rep ? rep[k] : full ? ps.filter((r) => r.bloc === b).reduce((s, r) => s + Number(r.seats), 0) : '';
+    const tr = el('tr');
+    tr.append(el('td', 'pt', name), el('td', 'c', seat('Likud')), el('td', 'c', seat('Yashar')), el('td', 'c', bs('Netanyahu bloc', 'netanyahu')), el('td', 'c', bs('Opposition', 'opposition')), el('td', 'c', bs('Arab parties', 'arab')));
+    ch.append(tr);
+  });
+}
+
+async function refresh() {
+  const names = ['status', 'official', 'exitpolls', 'blocs', 'regions', 'updates'];
+  const vals = await Promise.all(names.map(load));
+  render(Object.fromEntries(names.map((n, i) => [n, Array.isArray(vals[i]) ? vals[i] : []])));
+}
+refresh();
+setInterval(refresh, 120000);
+</script>
+</body>
+</html>
